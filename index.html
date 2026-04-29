@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>初めてのCodex — PowerShellで立ち上げるOpenAIのCLIコーディングエージェント</title>
+<meta name="description" content="OpenAIのCLIコーディングエージェント Codex を、Windows PowerShellから初めて立ち上げる手順。PowerShell起動からインストール、認証、最初のプロンプトまでをスクリーンショット付きで解説。">
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1f2937;
+    --muted: #6b7280;
+    --accent: #538bb0;
+    --accent-strong: #2F9B86;
+    --orange: #f97316;
+    --code-bg: #0f172a;
+    --code-fg: #e2e8f0;
+    --border: #e5e7eb;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+    color: var(--fg);
+    background: var(--bg);
+    line-height: 1.75;
+  }
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 96px;
+  }
+  header.hero {
+    border-bottom: 4px solid var(--accent);
+    padding-bottom: 24px;
+    margin-bottom: 40px;
+  }
+  header.hero .eyebrow {
+    color: var(--accent-strong);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.08em;
+  }
+  h1 {
+    font-size: 28px;
+    margin: 8px 0 16px;
+    line-height: 1.4;
+  }
+  h2 {
+    font-size: 22px;
+    margin-top: 48px;
+    margin-bottom: 16px;
+    padding-left: 12px;
+    border-left: 6px solid var(--accent);
+  }
+  h2 .step {
+    color: var(--orange);
+    font-weight: 700;
+    margin-right: 8px;
+  }
+  p { margin: 0 0 16px; }
+  ul, ol { padding-left: 1.5em; }
+  li { margin: 6px 0; }
+  code {
+    font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+    background: #f3f4f6;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-fg);
+    padding: 16px 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  pre code { background: none; padding: 0; color: inherit; }
+  figure {
+    margin: 24px 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  figure img { display: block; width: 100%; height: auto; }
+  figcaption {
+    padding: 8px 12px;
+    font-size: 13px;
+    color: var(--muted);
+    background: #fafafa;
+    border-top: 1px solid var(--border);
+  }
+  .callout {
+    background: rgba(47, 155, 134, 0.08);
+    border-left: 4px solid var(--accent-strong);
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin: 24px 0;
+  }
+  footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 13px;
+  }
+  footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="container">
+<header class="hero">
+  <div class="eyebrow">GETTING STARTED</div>
+  <h1>初めてのCodex — PowerShellで立ち上げるOpenAIのCLIコーディングエージェント</h1>
+  <p style="color: var(--muted); margin: 0;">Windows PowerShellからCodexを初めて立ち上げる手順を、スクリーンショット付きで解説。</p>
+</header>
+
+<p>OpenAIのCLIコーディングエージェント「Codex」を、PowerShellから初めて立ち上げてみた。普段Claude Codeを使っているATH視点で、起動の流れと最初の画面を残しておく。</p>
+
+<h2>Codexってなんだ</h2>
+<p>OpenAIが提供する、ターミナルで動くコーディング用AIエージェント。雑に言えば、Claude CodeのOpenAI版にあたる。プロンプトに自然言語で指示を書くと、ファイル操作やシェル実行を自律的にこなしてくれる。</p>
+
+<h2>必要なもの</h2>
+<ul>
+  <li>Node.js（LTS版を推奨）</li>
+  <li>ChatGPT Plus / Pro / Business / Enterprise プラン、またはOpenAI APIキー</li>
+</ul>
+
+<h2><span class="step">STEP 1</span>PowerShellを開く</h2>
+<p>Windowsキーを押して検索欄に「powershell」と入力すると、検索結果のトップに「Windows PowerShell」が出てくる。これを選んで起動する。</p>
+<figure>
+  <img src="assets/codex_pwsh_search.png" alt="Windowsの検索結果からPowerShellを選択する画面">
+  <figcaption>図1: Windows検索でPowerShellを開く</figcaption>
+</figure>
+
+<h2><span class="step">STEP 2</span>Codexをインストールして起動</h2>
+<p>PowerShellが開いたら、npmでCodex CLIをグローバルインストールする。</p>
+<pre><code>npm install -g @openai/codex</code></pre>
+<figure>
+  <img src="assets/codex_npm_install.png" alt="PowerShellで npm install -g @openai/codex を実行する画面">
+  <figcaption>図2: PowerShellで npm install -g @openai/codex</figcaption>
+</figure>
+<p>事前にNode.js（LTS版）が入っていることが前提。インストールが終わったら、続けて<code>codex</code>と打って起動する。</p>
+<pre><code>codex</code></pre>
+
+<h2><span class="step">STEP 3</span>認証メニューで認証方式を選ぶ</h2>
+<p>起動するとASCIIアートとともに「Welcome to Codex, OpenAI's command-line coding agent」が表示され、3つの認証方法から選ぶ画面になる。</p>
+<figure>
+  <img src="assets/codex_welcome.png" alt="Codex CLI 起動直後の認証メニュー画面">
+  <figcaption>図3: 起動直後の認証メニュー（Sign in with ChatGPT / Device Code / API key）</figcaption>
+</figure>
+<ol>
+  <li><strong>Sign in with ChatGPT</strong> — ChatGPT Plus / Pro / Business / Enterpriseプランがあれば追加料金なしで使える</li>
+  <li><strong>Sign in with Device Code</strong> — 別端末からワンタイムコードで認証</li>
+  <li><strong>Provide your own API key</strong> — OpenAI APIキーで従量課金</li>
+</ol>
+<p>ChatGPT有料プランを契約済みならば、迷わず1番でいい。Enterを押せばブラウザが開いて、ChatGPTでログインするだけで認証は終わる。</p>
+
+<h2><span class="step">STEP 4</span>サインイン後の画面</h2>
+<p>サインインに成功すると、Codexのプロンプトが立ち上がる。</p>
+<figure>
+  <img src="assets/codex_ready.png" alt="Codex サインイン後の起動画面（モデル名・ディレクトリ表示）">
+  <figcaption>図4: サインイン後の起動画面（model: gpt-5.4 / directory: ~ / Sandbox ready）</figcaption>
+</figure>
+<ul>
+  <li><code>model: gpt-5.4</code> — 使用モデル。<code>/model</code>で切り替え可能</li>
+  <li><code>directory: ~</code> — 起動時のカレントディレクトリ</li>
+  <li><code>Tip: Use /fast to enable our fastest inference</code> — <code>/fast</code>で高速推論モード</li>
+  <li><code>Sandbox ready</code> — 作業可能状態</li>
+</ul>
+<p>あとはプロンプトに「このリポジトリのテストを通して」「READMEを要約して」のような指示を書けば、ファイル操作やシェル実行を含めて自律的に動いてくれる。Claude Codeを触ったことがある人なら、操作感はほぼ違和感なく入れる。</p>
+
+<h2>フォルダ経営の視点で見ると</h2>
+<p>ターミナル型のAIエージェントは、Claude Code、GitHub Copilot CLI、そしてCodexと選択肢が一気に広がってきた。複数のエージェントを並走させる景色は、もはや当たり前の方向に進んでいる。</p>
+<div class="callout">
+  AppTalentHubのCredo「Company as a Filesystem」の視点で見ると、これらのエージェントは"フォルダ経営"を担う実働部隊だ。同じディレクトリ構造の上で、得意分野の異なるエージェントを使い分ける——人間の経営者は、何をどのエージェントに任せるかを設計する役割になっていく。
+</div>
+
+<h2>まとめ</h2>
+<ul>
+  <li>PowerShellを開く → <code>npm install -g @openai/codex</code> → <code>codex</code>で起動</li>
+  <li>ChatGPT有料プランがあれば追加料金なしで使える</li>
+  <li>Claude Codeとの併用が現実的な選択肢になってきた</li>
+</ul>
+
+<footer>
+  <p>Published by <a href="https://apptalenthub.co.jp/">AppTalentHub</a> · 2026-04-29</p>
+</footer>
+</div>
+</body>
+</html>
