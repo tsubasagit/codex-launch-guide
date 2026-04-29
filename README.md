@@ -2,7 +2,7 @@
 
 OpenAIのCLIコーディングエージェント「Codex」を、Windows PowerShellから初めて立ち上げる手順をスクリーンショット付きで解説するスタティックページ。
 
-GitHub Pagesで公開: <!-- TODO: 公開URLを記入 -->
+GitHub Pagesで公開: https://tsubasagit.github.io/codex-launch-guide/
 
 ## 構成
 
